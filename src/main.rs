@@ -1,8 +1,9 @@
 use clap::{arg, command, value_parser};
-use std::net::TcpListener;
+use std::{error::Error, net::TcpListener};
 
-fn find_free_port() {
+fn find_free_port() -> Result<u16, Box<dyn Error>> {
     println!("Finding free port");
+    Ok(TcpListener::bind(("127.0.0.1", 0))?.local_addr()?.port())
 }
 
 fn check_port_free(port: u16) {
@@ -23,6 +24,7 @@ fn main() {
     if let Some(port) = matches.get_one::<u16>("port") {
         check_port_free(*port)
     } else {
-        find_free_port()
+        let port = find_free_port().unwrap();
+        println!("Available tcp port is {port}");
     }
 }
